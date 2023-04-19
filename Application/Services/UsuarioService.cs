@@ -3,6 +3,7 @@ using Domain.Dto;
 using Domain.Entity;
 using Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Application.Services
 {
@@ -24,7 +25,10 @@ namespace Application.Services
             usuario.Apelido = usuarioDto.Apelido;
             usuario.Email = usuarioDto.Email;
             usuario.Cpf = usuarioDto.Cpf;
-            // usuario.DataNascimento = usuarioDto.DataNascimento;
+            usuario.Senha = usuarioDto.Senha;
+            usuario.Telefone = usuarioDto.Telefone;
+            usuario.DataDeNascimento = DateTime.ParseExact(usuarioDto.DataDeNascimento, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            usuario.DataCadastro = DateTime.Now;
             usuario.Sexo = (Domain.Enum.Sexo)(int?)usuarioDto.Sexo;
 
             usuario.Endereco = new Endereco();

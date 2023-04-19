@@ -9,7 +9,7 @@ CREATE TABLE enderecos (
   cidade VARCHAR(20),
   estado VARCHAR(2),
   pais VARCHAR(3),
-  cep VARCHAR(8)
+  cep VARCHAR(8) NOT NULL
 );
 
 CREATE TABLE usuarios (
@@ -17,14 +17,14 @@ CREATE TABLE usuarios (
   enderecoId CHAR(36),
   cpf VARCHAR(11) not null,
   email VARCHAR(50) not null,
-  nome_completo VARCHAR(100) not null,
+  nomeCompleto VARCHAR(100) not null,
   senha VARCHAR(100) not null,
   apelido VARCHAR(20),
-  data_nascimento DATE not null,
-  celular BIGINT(13) not null,
+  dataDeNascimento DATE not null,
+  telefone VARCHAR(13) not null,
   sexo TINYINT(2) not null,
-  data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
-  data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  dataCadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+  dataAtualizacao DATETIME DEFAULT NULL,
   FOREIGN KEY (enderecoId) REFERENCES enderecos(id)
 );
 
