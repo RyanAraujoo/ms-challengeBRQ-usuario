@@ -28,25 +28,27 @@ O objetivo geral do projeto `.NET API de gerenciamento de usuário` é fornecer 
 Finalmente, execute o comando `dotnet run` para iniciar a aplicação. Isso iniciará o servidor web da aplicação e você poderá acessar a aplicação no seu navegador web em http://localhost..., onde uma nova página no `Swagger` será gerada para identificar os endpoints e necessidades dos dados.
 
 ### Exemplar de Usuario
-`{
-  "Cpf": "0911111111",
-  "email": "contatoryanaraujo@gmail.com",
-  "DataNascimento": "2002-11-11",
+```
+{
+  "Cpf": "09282249500",
+  "email": "ryanpablosilvaaraujo@gmail.com",
+  "DataDeNascimento": "2002-11-11",
   "sexo": 1,
   "nomeCompleto": "Ryan Pablo Silva Araujo",
-  "senha": "ryan@123",
+  "senha": "ryan@1",
   "apelido": "fazopix",
-  "telefone": "7799822222",
+  "telefone": "99822912",
   "endereco": {
-    "logradouro": "Rua manoel alves xxx",
-    "numero": "191",
+    "logradouro": "Rua manoel alves texeira",
+    "numero": "199",
     "bairro": "osorio ferraz",
     "cidade": "vitoria da conquista",
     "estado": "ba",
     "pais": "Brasil",
-    "cep": "45141111"
+    "cep": "45140000"
   }
-}`
+}
+```
 
 ### Endpoints
 `POST` - /challengebrq/v1/usuarios
