@@ -23,8 +23,10 @@ CREATE TABLE usuarios (
   dataDeNascimento DATE not null,
   telefone VARCHAR(13) not null,
   sexo TINYINT(2) not null,
-  dataCadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+  dataCadastro DATETIME not null,
   dataAtualizacao DATETIME DEFAULT NULL,
-  FOREIGN KEY (enderecoId) REFERENCES enderecos(id)
+  FOREIGN KEY (enderecoId) REFERENCES enderecos(id),
+  UNIQUE KEY `cpf` (`cpf`),
+  UNIQUE KEY `email` (`email`)
 );
 

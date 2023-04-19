@@ -11,7 +11,7 @@ namespace Domain.Validation
             DateTime dat;
             if (DateTime.TryParse(value.ToString(), out dat))
             {
-                if (dat > DateTime.Now)
+                if (dat >= DateTime.Now)
                 {
                     return new ValidationResult("A DataDeNascimento precisa ser inferior a data atual");
                 }

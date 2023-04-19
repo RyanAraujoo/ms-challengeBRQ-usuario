@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Domain.Dto;
 using Domain.Entity;
+using Domain.Enum;
 using Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -16,6 +17,18 @@ namespace Application.Services
             _context = context;
         }
 
+        private int TrasnformarStringEmIntEnumSexo(string stringValueSexo)
+        {
+            foreach (var item in Enum.GetValues(typeof(Sexo)))
+            {
+                if (stringValueSexo == item.ToString())
+                {
+                    return (int)item;
+                }
+            }
+            return 4;
+        }
+
         public async Task<Usuario> CadastrarUsuario(UsuarioDto usuarioDto)
         {
             Usuario usuario = new Usuario();
@@ -27,9 +40,9 @@ namespace Application.Services
             usuario.Cpf = usuarioDto.Cpf;
             usuario.Senha = usuarioDto.Senha;
             usuario.Telefone = usuarioDto.Telefone;
-            usuario.DataDeNascimento = DateTime.ParseExact(usuarioDto.DataDeNascimento, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            usuario.DataDeNascimento = usuarioDto.DataDeNascimento;
+            usuario.Sexo = this.TrasnformarStringEmIntEnumSexo(usuarioDto.Sexo);
             usuario.DataCadastro = DateTime.Now;
-            usuario.Sexo = (Domain.Enum.Sexo)(int?)usuarioDto.Sexo;
 
             usuario.Endereco = new Endereco();
             usuario.Endereco.Id = new Guid();
@@ -37,6 +50,7 @@ namespace Application.Services
             usuario.Endereco.Cep = usuarioDto.Endereco.Cep;
             usuario.Endereco.Numero = usuarioDto.Endereco.Numero;
             usuario.Endereco.Bairro = usuarioDto.Endereco.Bairro;
+            usuario.Endereco.Estado = usuarioDto.Endereco.Estado;
             usuario.Endereco.Cidade = usuarioDto.Endereco.Cidade;
             usuario.Endereco.Pais = usuarioDto.Endereco.Pais;
 

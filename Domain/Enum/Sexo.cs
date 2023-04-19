@@ -8,8 +8,4 @@ namespace Domain.Enum
         B = 3,
         N = 4
     }
-
-    // var meuInteiro = 0;
-    // MinhaEnum foo = (MinhaEnum)meuInteiro;
-    // foo == MinhaEnum.Primeiro
 }

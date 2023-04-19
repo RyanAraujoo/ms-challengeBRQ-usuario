@@ -19,14 +19,19 @@ namespace Presentation.Controllers
         [HttpPost("usuarios")]
         public async Task<IActionResult> CadastrarUsuario([FromBody] UsuarioDto usuarioDto)
         {
-            var cadastrarUsuario = await _usuarioService.CadastrarUsuario(usuarioDto);
-
-            if (cadastrarUsuario is null)
+            try
             {
-                return UnprocessableEntity("");
-            }
-            // return Created("/challengebrq/v1/usuarios", usuarioDto);
-               return Created($"/{cadastrarUsuario.Id}", cadastrarUsuario);
+                var cadastrarUsuario = await _usuarioService.CadastrarUsuario(usuarioDto);
+                return Created($"/{cadastrarUsuario.Id}", cadastrarUsuario);
+
+            } catch (Exception ex)
+            {
+                if (ex.InnerException.Message.StartsWith("Duplicate"))
+                {
+                    return BadRequest("Algum item único está sendo duplicado..");
+                }
+                return UnprocessableEntity("Não foi possível processar o Body.");
+            }       
         }
     }
 }
