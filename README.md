@@ -30,14 +30,14 @@ Finalmente, execute o comando `dotnet run` para iniciar a aplicação. Isso inic
 ### Exemplar de Usuario
 ```
 {
-  "Cpf": "09282249500",
+  "Cpf": "01211149500",
   "email": "ryanpablosilvaaraujo@gmail.com",
   "DataDeNascimento": "2002-11-11",
   "sexo": 1,
   "nomeCompleto": "Ryan Pablo Silva Araujo",
   "senha": "ryan@1",
   "apelido": "fazopix",
-  "telefone": "99822912",
+  "telefone": "7799889671",
   "endereco": {
     "logradouro": "Rua manoel alves texeira",
     "numero": "199",
