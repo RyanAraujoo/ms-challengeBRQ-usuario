@@ -1,0 +1,30 @@
+CREATE DATABASE ChallengeDbUsuarios;
+USE ChallengeDbUsuarios;
+
+CREATE TABLE enderecos (
+  id CHAR(36) PRIMARY KEY,
+  logradouro VARCHAR(100),
+  numero VARCHAR(10),
+  bairro VARCHAR(20),
+  cidade VARCHAR(20),
+  estado VARCHAR(2),
+  pais VARCHAR(3),
+  cep VARCHAR(8)
+);
+
+CREATE TABLE usuarios (
+  id CHAR(36) PRIMARY KEY,
+  enderecoId CHAR(36),
+  cpf VARCHAR(11) not null,
+  email VARCHAR(50) not null,
+  nome_completo VARCHAR(100) not null,
+  senha VARCHAR(100) not null,
+  apelido VARCHAR(20),
+  data_nascimento DATE not null,
+  celular BIGINT(13) not null,
+  sexo TINYINT(2) not null,
+  data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+  data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (enderecoId) REFERENCES enderecos(id)
+);
+
