@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dto\FromBodyPutEndereco.cs" />
+    <Compile Remove="Validation\ValidarDateTimeAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Resources\Resources.csproj" />
   </ItemGroup>
 

@@ -3,16 +3,14 @@
 
 # 📌 Tópicos
 
-<!--ts-->
-- [Visão geral](###-Visão-geral)
-- [Pré-requisitos](###-Pré-requisitos)
-- [Instalação](###-Instalação)
-- [Exemplar de Usuario](###-Exemplar-de-Usuario)
-- [Endpoints](###-Endpoints)
-- [Suporte](###-Suporte)
-- [Histórico de versões](###-Histórico-de-versões)
+- [Visão geral]
+- [Pré-requisitos]
+- [Instalação]
+- [Exemplar de Usuario]
+- [Endpoints]
+- [Suporte]
+- [Histórico de versões]
 
-<!--te-->
 ### Visão geral
 
 O objetivo geral do projeto `.NET API de gerenciamento de usuário` é fornecer um microsserviço confiável e escalável para gerenciar as operações básicas relacionadas a usuários, como criação, atualização, detalhamento, listagem e exclusão de usuários.
@@ -52,7 +50,10 @@ Finalmente, execute o comando `dotnet run` para iniciar a aplicação. Isso inic
 
 ### Endpoints
 `POST` - /challengebrq/v1/usuarios
-
+`GET` - /challengebrq/v1/usuarios
+`GET` - /challengebrq/v1/usuarios/{idusuario}
+`DELETE` - /challengebrq/v1/usuarios/{idusuario}
+`PATCH` - /challengebrq/v1/usuarios/{idusuario}
 ### Suporte
 [Linkedin](https://www.linkedin.com/in/ryanpsa/)
 

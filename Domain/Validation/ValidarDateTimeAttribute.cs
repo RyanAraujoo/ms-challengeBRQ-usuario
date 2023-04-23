@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Domain.Validation
 {
-    public class ValidarDataCadastroAttribute: ValidationAttribute
+    public class ValidarDateTimeAttribute: ValidationAttribute
     {
         protected override ValidationResult? IsValid(object? value,
                                                      ValidationContext validationContext)
@@ -18,7 +18,7 @@ namespace Domain.Validation
 
         private bool ValidarDataHora(string dataHora)
         {
-            string padrao = @"^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$";
+            string padrao = @"(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})";
             return Regex.IsMatch(dataHora, padrao);
         }
     }

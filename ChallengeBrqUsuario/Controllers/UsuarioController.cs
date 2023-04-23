@@ -33,6 +33,51 @@ namespace Presentation.Controllers
                 return UnprocessableEntity("Não foi possível processar o Body.");
             }       
         }
+
+        [HttpGet("usuarios")]
+        public async Task<IActionResult> ListarUsuarios()
+        {
+                var listarUsuarios = await _usuarioService.ListarUsuarios();
+                return Ok(listarUsuarios);
+        }
+        [HttpGet("usuarios/{idusuario}")]
+        public async Task<IActionResult> DetalharUsuario(Guid idusuario)
+        {
+                var detalharUsuario = await _usuarioService.DetalharUsuario(idusuario);
+
+                if (detalharUsuario == null)
+            {
+                return NotFound("Usuario não encontrado!");
+            }
+                return Ok(detalharUsuario);
+        }
+
+        [HttpDelete("usuarios/{idusuario}")]
+        public async Task<IActionResult> ExcluirUsuario(Guid idUsuario)
+        {
+            try
+            {
+                var excluirUsuario = await _usuarioService.ExcluirUsuario(idUsuario);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound($"{ex.Message}");
+            }        
+        }
+
+        [HttpPatch("usuarios/{idusuario}")]
+        public async Task<IActionResult> AtualizarUsuario(Guid idUsuario, [FromBody] FromBodyPutUsuarioDto fromBodyPutUsuarioDto)
+        {
+            try
+            {
+                var atualizarUsuario = await _usuarioService.AtualizarUsuario(idUsuario, fromBodyPutUsuarioDto);
+                return Ok(atualizarUsuario);
+            } catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
     }
 }
 
