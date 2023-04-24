@@ -6,6 +6,7 @@ using Infrastructure.DataBase;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Crypto.Generators;
 using System;
 using System.Globalization;
 
@@ -188,6 +189,26 @@ namespace Application.Services
             usuarioInicial.DataAtualizacao = DateTime.Now;
 
             return usuarioInicial;
+        }
+        public async Task<string> AlterarSenha(Guid id, TrocarSenhaDto senhas)
+        {
+            var procurarUsuarioParaTrocarSenha = _context.Usuarios.FirstAsync(x => x.Id == id);
+
+            if (procurarUsuarioParaTrocarSenha == null)
+            {
+                throw new Exception("Usuário não encontrado");
+            }
+
+           if (!(procurarUsuarioParaTrocarSenha.Result.Senha == senhas.SenhaAtual))
+            {
+                throw new Exception("Senha atual incorreta.");
+            }
+
+            procurarUsuarioParaTrocarSenha.Result.Senha = senhas.SenhaNova;
+            _context.Usuarios.Update(procurarUsuarioParaTrocarSenha.Result);
+            await _context.SaveChangesAsync();
+
+            return "Senha atualizada com sucesso.";
         }
     }
 }

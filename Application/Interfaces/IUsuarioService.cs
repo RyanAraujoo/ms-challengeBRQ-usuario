@@ -11,6 +11,6 @@ namespace Application.Interfaces
        public Task<Usuario> DetalharUsuario(Guid id);
        public Task<string> ExcluirUsuario(Guid id);
        public Task<Usuario> AtualizarUsuario(Guid id, FromBodyPutUsuarioDto fromBodyPutUsuarioDto);
-   
+       public Task<string> AlterarSenha(Guid id, TrocarSenhaDto senhas);
     }
 }

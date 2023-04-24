@@ -49,11 +49,12 @@ Finalmente, execute o comando `dotnet run` para iniciar a aplicação. Isso inic
 ```
 
 ### Endpoints
-`POST` - /challengebrq/v1/usuarios
-`GET` - /challengebrq/v1/usuarios
-`GET` - /challengebrq/v1/usuarios/{idusuario}
-`DELETE` - /challengebrq/v1/usuarios/{idusuario}
-`PATCH` - /challengebrq/v1/usuarios/{idusuario}
+`POST` - /challengebrq/v1/usuarios <br>
+`GET` - /challengebrq/v1/usuarios <br>
+`GET` - /challengebrq/v1/usuarios/{idusuario} <br>
+`DELETE` - /challengebrq/v1/usuarios/{idusuario} <br>
+`PATCH` - /challengebrq/v1/usuarios/{idusuario} <br>
+`PUT` - /challengebrq/v1/usuarios/{idusuario}/senhas <br>
 ### Suporte
 [Linkedin](https://www.linkedin.com/in/ryanpsa/)
 

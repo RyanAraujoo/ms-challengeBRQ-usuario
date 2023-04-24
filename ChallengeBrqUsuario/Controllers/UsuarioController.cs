@@ -26,12 +26,10 @@ namespace Presentation.Controllers
 
             } catch (Exception ex)
             {
-                if (ex.InnerException.Message.StartsWith("Duplicate"))
-                {
-                    return BadRequest("Algum item único está sendo duplicado..");
-                }
-                return UnprocessableEntity("Não foi possível processar o Body.");
-            }       
+                return ex.InnerException.Message.StartsWith("Duplicate")
+                    ? BadRequest("Algum item único está sendo duplicado..")
+                    : UnprocessableEntity("Não foi possível processar o Body.");
+            }
         }
 
         [HttpGet("usuarios")]
@@ -73,6 +71,18 @@ namespace Presentation.Controllers
             {
                 var atualizarUsuario = await _usuarioService.AtualizarUsuario(idUsuario, fromBodyPutUsuarioDto);
                 return Ok(atualizarUsuario);
+            } catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
+        [HttpPut("usuarios/{idusuario}/senhas")]
+        public async Task<IActionResult> TrocarSenha(Guid idUsuario, [FromBody] TrocarSenhaDto trocarSenhaDto)
+        {
+            try
+            {
+                var trocarSenha = await _usuarioService.AlterarSenha(idUsuario, trocarSenhaDto);
+                return NoContent();
             } catch (Exception ex)
             {
                 return BadRequest(ex.ToString());
