@@ -3,11 +3,7 @@ using Domain.Dto;
 using Domain.Entity;
 using Domain.Enum;
 using Infrastructure.DataBase;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Crypto.Generators;
-using System;
 using System.Globalization;
 
 namespace Application.Services
@@ -103,7 +99,7 @@ namespace Application.Services
             return "Usuario Removido com Sucesso!";
             
         }
-        public async Task<Usuario> AtualizarUsuario(Guid id, FromBodyPutUsuarioDto fromBodyPutUsuario)
+        public async Task<Usuario> AtualizarUsuario(Guid id, PatchUsuarioDto fromBodyPutUsuario)
         {
             var buscarUsuarioParaAtualizar = _context.Usuarios.FirstOrDefault(e => e.Id == id);
 
@@ -119,7 +115,7 @@ namespace Application.Services
             return buscarUsuarioParaAtualizar;
         }
 
-        private Usuario AtualizarCamposUsuario(Usuario usuarioInicial, FromBodyPutUsuarioDto usuarioFinal)
+        private Usuario AtualizarCamposUsuario(Usuario usuarioInicial, PatchUsuarioDto usuarioFinal)
         {
 
             if(!string.IsNullOrEmpty(usuarioFinal.NomeCompleto))
@@ -205,7 +201,45 @@ namespace Application.Services
             }
 
             procurarUsuarioParaTrocarSenha.Result.Senha = senhas.SenhaNova;
+            procurarUsuarioParaTrocarSenha.Result.DataAtualizacao = DateTime.Now;
             _context.Usuarios.Update(procurarUsuarioParaTrocarSenha.Result);
+            await _context.SaveChangesAsync();
+
+            return "Senha atualizada com sucesso.";
+        }
+        public async Task<HashDto> EsquecerSenha(Guid id)
+        {
+            var usuarioEncontrado = _context.Usuarios.FirstAsync(x => x.Id == id);
+
+            if (usuarioEncontrado == null)
+            {
+                throw new Exception("Email Inválido/Não Existente");
+            }
+            HashDto hash = new HashDto();
+            hash.id = Guid.NewGuid();
+            return hash;
+        }
+        public async Task<string> AlterarSenhaViaHash(Guid id,EsquecerSenhaDto hashComSenhaNova)
+        {
+            var usuarioEncontrado = _context.Usuarios.FirstAsync(x => x.Id == id);
+
+            if (usuarioEncontrado == null)
+            {
+                throw new Exception("Usuário não encontrado");
+            }
+
+            string minhaStringDeGuid = hashComSenhaNova.HashDeSeguranca;
+            Guid meuGuid;
+            Guid.TryParse(minhaStringDeGuid, out meuGuid);
+
+            if (!(Guid.TryParse(minhaStringDeGuid, out meuGuid)))
+            {
+                throw new Exception("Hash Inválido. Tente novamente.");
+            }
+           
+            usuarioEncontrado.Result.Senha = hashComSenhaNova.novaSenha;
+            usuarioEncontrado.Result.DataAtualizacao = DateTime.Now;
+            _context.Usuarios.Update(usuarioEncontrado.Result);
             await _context.SaveChangesAsync();
 
             return "Senha atualizada com sucesso.";

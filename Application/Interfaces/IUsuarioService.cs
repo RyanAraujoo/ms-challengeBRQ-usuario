@@ -10,7 +10,9 @@ namespace Application.Interfaces
        public Task<IEnumerable<object>> ListarUsuarios();
        public Task<Usuario> DetalharUsuario(Guid id);
        public Task<string> ExcluirUsuario(Guid id);
-       public Task<Usuario> AtualizarUsuario(Guid id, FromBodyPutUsuarioDto fromBodyPutUsuarioDto);
+       public Task<Usuario> AtualizarUsuario(Guid id, PatchUsuarioDto fromBodyPutUsuarioDto);
        public Task<string> AlterarSenha(Guid id, TrocarSenhaDto senhas);
+       public Task<HashDto> EsquecerSenha(Guid id);
+       public Task<string> AlterarSenhaViaHash (Guid id,EsquecerSenhaDto hashComSenhaNova);
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Dto
 {
-    public class FromBodyPatchEnderecoDto
+    public class PatchEnderecoDto
     {
         public string? Logradouro { get; set; }
         public string? Numero { get; set; }

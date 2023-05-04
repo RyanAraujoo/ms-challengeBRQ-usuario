@@ -65,11 +65,11 @@ namespace Presentation.Controllers
         }
 
         [HttpPatch("usuarios/{idusuario}")]
-        public async Task<IActionResult> AtualizarUsuario(Guid idUsuario, [FromBody] FromBodyPutUsuarioDto fromBodyPutUsuarioDto)
+        public async Task<IActionResult> AtualizarUsuario(Guid idUsuario, [FromBody] PatchUsuarioDto usuarioDto)
         {
             try
             {
-                var atualizarUsuario = await _usuarioService.AtualizarUsuario(idUsuario, fromBodyPutUsuarioDto);
+                var atualizarUsuario = await _usuarioService.AtualizarUsuario(idUsuario, usuarioDto);
                 return Ok(atualizarUsuario);
             } catch (Exception ex)
             {
@@ -84,6 +84,33 @@ namespace Presentation.Controllers
                 var trocarSenha = await _usuarioService.AlterarSenha(idUsuario, trocarSenhaDto);
                 return NoContent();
             } catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
+
+        [HttpGet("usuarios/{idusuario}/senhas")]
+        public async Task<IActionResult> EsquecerSenha(Guid idusuario)
+        {
+            try
+            {
+                var hashDeSeguranca = await _usuarioService.EsquecerSenha(idusuario);
+                return Ok(hashDeSeguranca);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("00000000-0000-0000-0000-000000000000");
+            }
+        }
+        [HttpPost("usuarios/{idusuario}/senhas")]
+        public async Task<IActionResult> AlterarSenhaViaHash(Guid idusuario, [FromBody] EsquecerSenhaDto esquecerSenhaDto)
+        {
+            try
+            {
+                var stringResposta = await _usuarioService.AlterarSenhaViaHash(idusuario, esquecerSenhaDto);
+                return Ok(stringResposta);
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.ToString());
             }

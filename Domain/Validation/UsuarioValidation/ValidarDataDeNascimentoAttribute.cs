@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace Domain.Validation
+namespace Domain.Validation.UsuarioValidation
 {
-    public class ValidarDataDeNascimentoAttribute: ValidationAttribute
+    public class ValidarDataDeNascimentoAttribute : ValidationAttribute
     {
         protected override ValidationResult? IsValid(object? value,
                                                      ValidationContext validationContext)
@@ -22,7 +22,7 @@ namespace Domain.Validation
                 return new ValidationResult("A DataDeNascimento precisa ser no modelo 'yyyy-MM-dd'");
             }
 
-            return ValidationResult.Success;
+            return string.IsNullOrWhiteSpace(value.ToString()) ? new ValidationResult("O campo DataDeNascimento está em branco/vazio. Tente novamente!") : ValidationResult.Success;
         }
 
         private bool ValidarPadraoDataDeNascimento(string data)
