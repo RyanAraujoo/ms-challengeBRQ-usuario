@@ -3,60 +3,63 @@
 
 # 📌 Tópicos
 
-- [Visão geral]
-- [Pré-requisitos]
-- [Instalação]
-- [Exemplar de Usuario]
-- [Endpoints]
-- [Suporte]
-- [Histórico de versões]
+- [Visão geral](#visao-geral)
+- [Pré-requisitos](#pre-requisito)
+- [Instalação](#instalacao)
+- [Exemplar de Usuario](#exemplar)
+- [Endpoints](#endpoints)
+- [Suporte](#suporte)
+- [Histórico de versões](#versoes)
 
-### Visão geral
+### Visão geral<a name="visao-geral"></a>
 
 O objetivo geral do projeto `.NET API de gerenciamento de usuário` é fornecer um microsserviço confiável e escalável para gerenciar as operações básicas relacionadas a usuários, como criação, atualização, detalhamento, listagem e exclusão de usuários.
 
-### Pré-requisitos
+### Pré-requisitos<a name="pre-requisito"></a>
 - SDK do .NET 6: o SDK (kit de desenvolvimento de software) 
 - IDE: você precisará de uma IDE (ambiente de desenvolvimento integrado)
 - Gerenciador de pacotes: o .NET 6 usa o gerenciador de pacotes NuGet
 
-### Instalação
+### Instalação<a name="instalacao"></a>
 - Execute o comando `dotnet restore` para restaurar as dependências do projeto. Isso baixará e instalará todas as bibliotecas e pacotes necessários para a aplicação funcionar corretamente.
 
 Finalmente, execute o comando `dotnet run` para iniciar a aplicação. Isso iniciará o servidor web da aplicação e você poderá acessar a aplicação no seu navegador web em http://localhost..., onde uma nova página no `Swagger` será gerada para identificar os endpoints e necessidades dos dados.
 
-### Exemplar de Usuario
+### Exemplar de Usuario<a name="exemplar"></a>
 ```
 {
   "Cpf": "01211149500",
-  "email": "ryanpablosilvaaraujo@gmail.com",
-  "DataDeNascimento": "2002-11-11",
+  "email": "ryan@gmail.com",
+  "DataDeNascimento": "2002-10-10",
   "sexo": 1,
   "nomeCompleto": "Ryan Pablo Silva Araujo",
   "senha": "ryan@1",
   "apelido": "fazopix",
-  "telefone": "7799889671",
+  "telefone": "77998896712",
   "endereco": {
-    "logradouro": "Rua manoel alves texeira",
-    "numero": "199",
-    "bairro": "osorio ferraz",
-    "cidade": "vitoria da conquista",
+    "logradouro": "Rua alves",
+    "numero": "191",
+    "bairro": "ferraz osório",
+    "cidade": "ilheus",
     "estado": "ba",
-    "pais": "Brasil",
-    "cep": "45140000"
+    "pais": "br",
+    "cep": "55140000"
   }
 }
 ```
 
-### Endpoints
-`POST` - /challengebrq/v1/usuarios <br>
-`GET` - /challengebrq/v1/usuarios <br>
-`GET` - /challengebrq/v1/usuarios/{idusuario} <br>
-`DELETE` - /challengebrq/v1/usuarios/{idusuario} <br>
-`PATCH` - /challengebrq/v1/usuarios/{idusuario} <br>
-`PUT` - /challengebrq/v1/usuarios/{idusuario}/senhas <br>
-### Suporte
+### Endpoints<a name="endpoints"></a>
+`POST` - /challengebrq/v1/usuarios                      `Cadastrar Usuários` <br>
+`GET` - /challengebrq/v1/usuarios                       `Listar Usuários` <br>
+`GET` - /challengebrq/v1/usuarios/{idusuario}           `Detalhar Usuários` <br>
+`DELETE` - /challengebrq/v1/usuarios/{idusuario}        `Deletar Usuário` <br>
+`PATCH` - /challengebrq/v1/usuarios/{idusuario}         `Atualizar Usuário` <br>
+`PUT` - /challengebrq/v1/usuarios/{idusuario}/senhas    `AlterarSenha` <br>
+`GET` - /challengebrq/v1/usuarios/{idusuario}/senhas    `Gerar Hash (Esqueceu a senha)` <br>
+`POST` - /challengebrq/v1/usuarios/{idusuario}/senhas   `AlterarSenhaViaHash` <br>
+
+### Suporte<a name="suporte"></a>
 [Linkedin](https://www.linkedin.com/in/ryanpsa/)
 
-### Histórico de versões
+### Histórico de versões<a name="versoes"></a>
 - Versão 1 - [Em andamento]
