@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Domain.Dto;
-using Domain.Entity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
@@ -35,19 +34,27 @@ namespace Presentation.Controllers
         [HttpGet("usuarios")]
         public async Task<IActionResult> ListarUsuarios()
         {
+            try
+            {
                 var listarUsuarios = await _usuarioService.ListarUsuarios();
                 return Ok(listarUsuarios);
+            } catch(Exception ex)
+            {
+                return BadRequest($"{ex.Message}");
+            }            
         }
         [HttpGet("usuarios/{idusuario}")]
         public async Task<IActionResult> DetalharUsuario(Guid idusuario)
         {
-                var detalharUsuario = await _usuarioService.DetalharUsuario(idusuario);
-
-                if (detalharUsuario == null)
+            try
             {
-                return NotFound("Usuario não encontrado!");
-            }
+                var detalharUsuario = await _usuarioService.DetalharUsuario(idusuario);
                 return Ok(detalharUsuario);
+            }
+            catch (Exception ex)
+            {
+                return NotFound($"{ex.Message}");
+            }
         }
 
         [HttpDelete("usuarios/{idusuario}")]
@@ -99,7 +106,7 @@ namespace Presentation.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("00000000-0000-0000-0000-000000000000");
+                return BadRequest($"{ex.Message}");
             }
         }
         [HttpPost("usuarios/{idusuario}/senhas")]
