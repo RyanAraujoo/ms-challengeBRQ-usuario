@@ -2,19 +2,19 @@
 using Domain.Dto;
 using Domain.Entity;
 using Domain.Enum;
-using Infrastructure.DataBase;
-using Microsoft.EntityFrameworkCore;
+using Infrastructure.Interfaces;
 using System.Globalization;
 
 namespace Application.Services
 {
+
     public class UsuarioService : IUsuarioService
     {
-        private readonly ApiDbContext _context;
+        private readonly IUsuarioRepository _usuarioRepository;
 
-        public UsuarioService(ApiDbContext context)
+        public UsuarioService(IUsuarioRepository usuarioRepository)
         {
-            _context = context;
+            _usuarioRepository = usuarioRepository;
         }
 
         private int TrasnformarStringEmIntEnumSexo(string stringValueSexo)
@@ -54,70 +54,41 @@ namespace Application.Services
             usuario.Endereco.Cidade = usuarioDto.Endereco.Cidade;
             usuario.Endereco.Pais = usuarioDto.Endereco.Pais;
 
-            await _context.Usuarios.AddAsync(usuario);
-            await _context.SaveChangesAsync();
-
+            _usuarioRepository.CadastrarUsuario(usuario);
+           
             return usuario;
         }
-
+        
         public async Task<IEnumerable<object>> ListarUsuarios()
         {
-            return await _context.Usuarios.Select(ItemObjUsuario => new {
-                ItemObjUsuario.Id,
-                ItemObjUsuario.Cpf,
-                ItemObjUsuario.Email,
-                ItemObjUsuario.NomeCompleto
-            }).ToListAsync();
+           return await _usuarioRepository.ListarUsuarios(); 
         }
 
         public async Task<Usuario> DetalharUsuario(Guid id)
         {
-            var reqUsuario = await _context.Usuarios.FirstOrDefaultAsync(e => e.Id.Equals(id));
-
-            if (reqUsuario == null)
-            {
-                return null;
-            }
-
-            reqUsuario.Endereco = await _context.Enderecos.FirstOrDefaultAsync(e => e.Id.Equals(reqUsuario.EnderecoId));
-
-            return reqUsuario;
+            return await _usuarioRepository.DetalharUsuario(id);
         }
 
         public async Task<string> ExcluirUsuario(Guid id)
         {
-            var buscarUsuarioParaExcluir = await _context.Usuarios.FirstOrDefaultAsync(e => e.Id == id);
-
-            if (buscarUsuarioParaExcluir == null)
-            {
-                return "Cliente não encontrado para remoção!";
-            }
-
-            _context.Usuarios.Remove(buscarUsuarioParaExcluir);
-            await _context.SaveChangesAsync();
-
-            return "Usuario Removido com Sucesso!";
-            
+           return await _usuarioRepository.ExcluirUsuario(id);
         }
         public async Task<Usuario> AtualizarUsuario(Guid id, PatchUsuarioDto fromBodyPutUsuario)
         {
-            var buscarUsuarioParaAtualizar = _context.Usuarios.FirstOrDefault(e => e.Id == id);
-
+            var buscarUsuarioParaAtualizar = await _usuarioRepository.buscarUsuario(id);
             if (buscarUsuarioParaAtualizar == null)
             {
-                return null;
+                throw new Exception("Usuario não identificado.");
             }
-
             buscarUsuarioParaAtualizar = AtualizarCamposUsuario(buscarUsuarioParaAtualizar, fromBodyPutUsuario);
-            _context.Usuarios.Update(buscarUsuarioParaAtualizar);
-            await _context.SaveChangesAsync();
+
+            await _usuarioRepository.AtualizarUsuario(buscarUsuarioParaAtualizar);
 
             return buscarUsuarioParaAtualizar;
         }
 
         private Usuario AtualizarCamposUsuario(Usuario usuarioInicial, PatchUsuarioDto usuarioFinal)
         {
-
             if(!string.IsNullOrEmpty(usuarioFinal.NomeCompleto))
             {
                 usuarioInicial.NomeCompleto = usuarioFinal.NomeCompleto;
@@ -151,7 +122,8 @@ namespace Application.Services
             usuarioInicial.Endereco = new Endereco();
             usuarioInicial.Endereco.Id = usuarioInicial.EnderecoId;
 
-            usuarioInicial.Endereco = _context.Enderecos.FirstOrDefault(e => e.Id == usuarioInicial.EnderecoId);
+            usuarioInicial.Endereco = _usuarioRepository.buscarEnderecoUsuario(usuarioInicial).Result;
+
             if (!string.IsNullOrEmpty(usuarioFinal.Endereco.Cidade))
             {
                 usuarioInicial.Endereco.Cidade = usuarioFinal.Endereco.Cidade;
@@ -188,28 +160,27 @@ namespace Application.Services
         }
         public async Task<string> AlterarSenha(Guid id, TrocarSenhaDto senhas)
         {
-            var procurarUsuarioParaTrocarSenha = _context.Usuarios.FirstAsync(x => x.Id == id);
+            var procurarUsuarioParaTrocarSenha = _usuarioRepository.buscarUsuario(id);
 
             if (procurarUsuarioParaTrocarSenha == null)
             {
                 throw new Exception("Usuário não encontrado");
             }
 
-           if (!(procurarUsuarioParaTrocarSenha.Result.Senha == senhas.SenhaAtual))
+            if (!(procurarUsuarioParaTrocarSenha.Result.Senha == senhas.SenhaAtual))
             {
                 throw new Exception("Senha atual incorreta.");
             }
 
             procurarUsuarioParaTrocarSenha.Result.Senha = senhas.SenhaNova;
             procurarUsuarioParaTrocarSenha.Result.DataAtualizacao = DateTime.Now;
-            _context.Usuarios.Update(procurarUsuarioParaTrocarSenha.Result);
-            await _context.SaveChangesAsync();
+            _usuarioRepository.AtualizarUsuario(procurarUsuarioParaTrocarSenha.Result);
 
             return "Senha atualizada com sucesso.";
         }
         public async Task<HashDto> EsquecerSenha(Guid id)
         {
-            var usuarioEncontrado = _context.Usuarios.FirstAsync(x => x.Id == id);
+            var usuarioEncontrado = _usuarioRepository.buscarUsuario(id);
 
             if (usuarioEncontrado == null)
             {
@@ -221,7 +192,7 @@ namespace Application.Services
         }
         public async Task<string> AlterarSenhaViaHash(Guid id,EsquecerSenhaDto hashComSenhaNova)
         {
-            var usuarioEncontrado = _context.Usuarios.FirstAsync(x => x.Id == id);
+            var usuarioEncontrado = _usuarioRepository.buscarUsuario(id);
 
             if (usuarioEncontrado == null)
             {
@@ -236,13 +207,10 @@ namespace Application.Services
             {
                 throw new Exception("Hash Inválido. Tente novamente.");
             }
-           
-            usuarioEncontrado.Result.Senha = hashComSenhaNova.novaSenha;
-            usuarioEncontrado.Result.DataAtualizacao = DateTime.Now;
-            _context.Usuarios.Update(usuarioEncontrado.Result);
-            await _context.SaveChangesAsync();
 
             return "Senha atualizada com sucesso.";
         }
     }
 }
+
+
