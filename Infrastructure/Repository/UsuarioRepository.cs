@@ -49,20 +49,9 @@ namespace Infrastructure.Repository
         }
         public async Task<bool> CadastrarUsuario(Usuario usuario)
         {
-            try
-            {
-               if ( !(TestarConexao()) )
-                {
-                    throw new Exception("Forçando uma exceção de falha de banco de dados");
-                }
                 await _context.Usuarios.AddAsync(usuario);
                 await _context.SaveChangesAsync();
                 return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
         }
         public async Task<Usuario> DetalharUsuario(Guid id)
         {

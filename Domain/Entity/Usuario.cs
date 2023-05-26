@@ -18,6 +18,10 @@ namespace Domain.Entity
         public string Senha { get; set; }
         public string Apelido { get; set; }
         public string Telefone { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Guid? CodigoSeguranca { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public DateTime? DataHoraCodigoSeguranca { get; set; }
         public DateTime DataCadastro { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

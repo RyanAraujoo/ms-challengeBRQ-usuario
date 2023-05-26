@@ -2,6 +2,7 @@
 {
     public class HashDto
     {
-        public Guid? id { get; set; }
+        public Guid? CodigoSeguranca { get; set; }
+        public DateTime? DataHoraCodigoSeguranca { get; set; }
     }
 }

@@ -54,7 +54,7 @@ namespace Application.Services
             usuario.Endereco.Cidade = usuarioDto.Endereco.Cidade;
             usuario.Endereco.Pais = usuarioDto.Endereco.Pais;
 
-            _usuarioRepository.CadastrarUsuario(usuario);
+           await _usuarioRepository.CadastrarUsuario(usuario);
            
             return usuario;
         }
@@ -160,39 +160,44 @@ namespace Application.Services
         }
         public async Task<string> AlterarSenha(Guid id, TrocarSenhaDto senhas)
         {
-            var procurarUsuarioParaTrocarSenha = _usuarioRepository.buscarUsuario(id);
+            var procurarUsuarioParaTrocarSenha = await _usuarioRepository.buscarUsuario(id);
 
             if (procurarUsuarioParaTrocarSenha == null)
             {
                 throw new Exception("Usuário não encontrado");
             }
 
-            if (!(procurarUsuarioParaTrocarSenha.Result.Senha == senhas.SenhaAtual))
+            if (!(procurarUsuarioParaTrocarSenha.Senha == senhas.SenhaAtual))
             {
                 throw new Exception("Senha atual incorreta.");
             }
 
-            procurarUsuarioParaTrocarSenha.Result.Senha = senhas.SenhaNova;
-            procurarUsuarioParaTrocarSenha.Result.DataAtualizacao = DateTime.Now;
-            _usuarioRepository.AtualizarUsuario(procurarUsuarioParaTrocarSenha.Result);
+            procurarUsuarioParaTrocarSenha.Senha = senhas.SenhaNova;
+            procurarUsuarioParaTrocarSenha.DataAtualizacao = DateTime.Now;
+            await _usuarioRepository.AtualizarUsuario(procurarUsuarioParaTrocarSenha);
 
             return "Senha atualizada com sucesso.";
         }
         public async Task<HashDto> EsquecerSenha(Guid id)
         {
-            var usuarioEncontrado = _usuarioRepository.buscarUsuario(id);
+            var usuarioEncontrado = await _usuarioRepository.buscarUsuario(id);
 
             if (usuarioEncontrado == null)
             {
                 throw new Exception("Email Inválido/Não Existente");
             }
             HashDto hash = new HashDto();
-            hash.id = Guid.NewGuid();
+            hash.CodigoSeguranca = Guid.NewGuid();
+            hash.DataHoraCodigoSeguranca = DateTime.Now;
+
+            usuarioEncontrado.CodigoSeguranca = hash.CodigoSeguranca;
+            usuarioEncontrado.DataHoraCodigoSeguranca = hash.DataHoraCodigoSeguranca;
+           await _usuarioRepository.AtualizarUsuario(usuarioEncontrado);
             return hash;
         }
         public async Task<string> AlterarSenhaViaHash(Guid id,EsquecerSenhaDto hashComSenhaNova)
         {
-            var usuarioEncontrado = _usuarioRepository.buscarUsuario(id);
+            var usuarioEncontrado = await _usuarioRepository.buscarUsuario(id);
 
             if (usuarioEncontrado == null)
             {
@@ -207,6 +212,26 @@ namespace Application.Services
             {
                 throw new Exception("Hash Inválido. Tente novamente.");
             }
+
+            if (!(meuGuid == usuarioEncontrado.CodigoSeguranca))
+            {
+                throw new Exception("Código de Segurança Inválido!");
+            }
+
+            if (usuarioEncontrado.Senha == hashComSenhaNova.novaSenha)
+            {
+                throw new Exception("Essa senha foi utilizada anteriormente!");
+            }
+            TimeSpan dataAtual = (TimeSpan)(DateTime.Now - usuarioEncontrado.DataHoraCodigoSeguranca);
+            if (dataAtual.TotalMinutes >= 5)
+            {
+                throw new Exception("Tempo de mudança extrapolado! Gere um novo código.");
+            }
+
+            usuarioEncontrado.Senha = hashComSenhaNova.novaSenha;
+            usuarioEncontrado.DataAtualizacao = DateTime.Now;
+
+            _usuarioRepository.AtualizarUsuario(usuarioEncontrado);
 
             return "Senha atualizada com sucesso.";
         }
