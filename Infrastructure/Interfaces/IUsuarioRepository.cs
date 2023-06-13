@@ -11,7 +11,7 @@ namespace Infrastructure.Interfaces
     public interface IUsuarioRepository
     {
         public Task<bool> CadastrarUsuario(Usuario usuario);
-        public Task<IEnumerable<object>> ListarUsuarios();
+        public Task<IEnumerable<UsuarioDetalhadoDto>> ListarUsuarios();
         public Task<Usuario> DetalharUsuario(Guid id);
         public Task<string> ExcluirUsuario(Guid id);
         public Task<Usuario> AtualizarUsuario(Usuario usuarioAtualizado);

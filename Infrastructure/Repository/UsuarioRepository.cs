@@ -76,9 +76,9 @@ namespace Infrastructure.Repository
             await _context.SaveChangesAsync();
             return "Usuario Removido com Sucesso!";
         }
-        public async Task<IEnumerable<object>> ListarUsuarios()
+        public async Task<IEnumerable<UsuarioDetalhadoDto>> ListarUsuarios()
         {
-            return await _context.Usuarios.Select(ItemObjUsuario => new {
+            return (IEnumerable<UsuarioDetalhadoDto>)await _context.Usuarios.Select(ItemObjUsuario => new {
                 ItemObjUsuario.Id,
                 ItemObjUsuario.Cpf,
                 ItemObjUsuario.Email,

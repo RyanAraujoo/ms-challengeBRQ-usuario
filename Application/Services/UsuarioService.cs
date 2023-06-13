@@ -11,10 +11,12 @@ namespace Application.Services
     public class UsuarioService : IUsuarioService
     {
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly ICepService _cepService;
 
-        public UsuarioService(IUsuarioRepository usuarioRepository)
+        public UsuarioService(IUsuarioRepository usuarioRepository, ICepService cepService)
         {
             _usuarioRepository = usuarioRepository;
+            _cepService = cepService;
         }
 
         private int TrasnformarStringEmIntEnumSexo(string stringValueSexo)
@@ -46,20 +48,35 @@ namespace Application.Services
 
             usuario.Endereco = new Endereco();
             usuario.Endereco.Id = new Guid();
-            usuario.Endereco.Logradouro = usuarioDto.Endereco.Logradouro;
+            CepDto enderecoAPI = await _cepService.BuscarCep(usuarioDto.Endereco.Cep);
+            usuario.Endereco = _cepService.EnriquecerEndereco(usuario.Endereco, enderecoAPI);
             usuario.Endereco.Cep = usuarioDto.Endereco.Cep;
             usuario.Endereco.Numero = usuarioDto.Endereco.Numero;
-            usuario.Endereco.Bairro = usuarioDto.Endereco.Bairro;
-            usuario.Endereco.Estado = usuarioDto.Endereco.Estado;
-            usuario.Endereco.Cidade = usuarioDto.Endereco.Cidade;
-            usuario.Endereco.Pais = usuarioDto.Endereco.Pais;
 
-           await _usuarioRepository.CadastrarUsuario(usuario);
+            if (String.IsNullOrEmpty(usuario.Endereco.Logradouro))
+            {
+                if (String.IsNullOrEmpty(usuarioDto.Endereco.Logradouro))
+                {
+                    throw new Exception("Não foi possível identificar o Logradouro. Informe, por favor.");
+                }
+                    usuario.Endereco.Logradouro = usuarioDto.Endereco.Logradouro;
+            }
+
+            if (String.IsNullOrEmpty(usuario.Endereco.Bairro))
+            {
+                if (String.IsNullOrEmpty(usuarioDto.Endereco.Bairro))
+                {
+                    throw new Exception("Não foi possível identificar o Bairro. Informe, por favor.");
+                }
+                usuario.Endereco.Bairro = usuarioDto.Endereco.Bairro;
+            }
+
+            await _usuarioRepository.CadastrarUsuario(usuario);
            
             return usuario;
         }
         
-        public async Task<IEnumerable<object>> ListarUsuarios()
+        public async Task<IEnumerable<UsuarioDetalhadoDto>> ListarUsuarios()
         {
            return await _usuarioRepository.ListarUsuarios(); 
         }

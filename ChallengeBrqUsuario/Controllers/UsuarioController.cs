@@ -25,9 +25,11 @@ namespace Presentation.Controllers
 
             } catch (Exception ex)
             {
-                return ex.InnerException.Message.StartsWith("Duplicate")
-                    ? BadRequest("Algum item único está sendo duplicado..")
-                    : UnprocessableEntity("Não foi possível processar o Body.");
+                if (ex.InnerException.Message.StartsWith("Duplicate"))
+                {
+                    return BadRequest("Algum item único está sendo duplicado.");
+                }
+                  return UnprocessableEntity(ex.ToString());
             }
         }
 
@@ -40,7 +42,7 @@ namespace Presentation.Controllers
                 return Ok(listarUsuarios);
             } catch(Exception ex)
             {
-                return BadRequest($"{ex.Message}");
+                return BadRequest(ex.ToString());
             }            
         }
         [HttpGet("usuarios/{idusuario}")]
@@ -53,7 +55,7 @@ namespace Presentation.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound($"{ex.Message}");
+                return NotFound(ex.ToString());
             }
         }
 
@@ -67,7 +69,7 @@ namespace Presentation.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound($"{ex.Message}");
+                return NotFound(ex.ToString());
             }        
         }
 
@@ -106,7 +108,7 @@ namespace Presentation.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"{ex.Message}");
+                return BadRequest(ex.ToString());
             }
         }
         [HttpPost("usuarios/{idusuario}/senhas")]
