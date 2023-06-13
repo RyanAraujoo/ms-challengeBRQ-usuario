@@ -76,7 +76,7 @@ namespace Application.Services
             return usuario;
         }
         
-        public async Task<IEnumerable<object>> ListarUsuarios()
+        public async Task<IEnumerable<UsuarioDetalhadoDto>> ListarUsuarios()
         {
            return await _usuarioRepository.ListarUsuarios(); 
         }
