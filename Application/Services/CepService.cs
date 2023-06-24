@@ -22,16 +22,6 @@ namespace Application.Services
             }
                 throw new Exception("Falha na comunicação com a API CEP.");
         }
-
-        public Endereco EnriquecerEndereco(Endereco Endereco, CepDto EnderecoAPI)
-        {
-            Endereco.Cep = EnderecoAPI.Cep;
-            Endereco.Logradouro = EnderecoAPI.Logradouro;
-            Endereco.Bairro = EnderecoAPI.UF;
-            Endereco.Cidade = EnderecoAPI.Localidade;
-            Endereco.Complemento = EnderecoAPI.Complemento;
-            return Endereco;
-        }
     }
 
 }

@@ -9,6 +9,6 @@ namespace Domain.Dto
         public string? HashDeSeguranca { get; set; }
 
         [Required(ErrorMessage = "O campo NovaSenha deve estar preenchido.")]
-        public string? novaSenha { get; set; }
+        public string? NovaSenha { get; set; }
     }
 }

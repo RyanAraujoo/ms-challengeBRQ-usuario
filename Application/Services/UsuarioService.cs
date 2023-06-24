@@ -17,6 +17,7 @@ namespace Application.Services
         {
             _usuarioRepository = usuarioRepository;
             _cepService = cepService;
+            
         }
 
         private int TrasnformarStringEmIntEnumSexo(string stringValueSexo)
@@ -49,9 +50,14 @@ namespace Application.Services
             usuario.Endereco = new Endereco();
             usuario.Endereco.Id = new Guid();
             CepDto enderecoAPI = await _cepService.BuscarCep(usuarioDto.Endereco.Cep);
-            usuario.Endereco = _cepService.EnriquecerEndereco(usuario.Endereco, enderecoAPI);
-            usuario.Endereco.Cep = usuarioDto.Endereco.Cep;
+            usuario.Endereco.Cidade = enderecoAPI.Localidade;
+            usuario.Endereco.Cep = enderecoAPI.Cep;
+            usuario.Endereco.Logradouro = enderecoAPI.Logradouro;
+            usuario.Endereco.Bairro = enderecoAPI.Bairro;
             usuario.Endereco.Numero = usuarioDto.Endereco.Numero;
+            usuario.Endereco.Complemento = usuarioDto.Endereco.Complemento;
+            usuario.Endereco.Estado = enderecoAPI.UF;
+            usuario.Endereco.Pais = "BR";
 
             if (String.IsNullOrEmpty(usuario.Endereco.Logradouro))
             {
@@ -86,7 +92,7 @@ namespace Application.Services
             return await _usuarioRepository.DetalharUsuario(id);
         }
 
-        public async Task<string> ExcluirUsuario(Guid id)
+        public async Task<bool> ExcluirUsuario(Guid id)
         {
            return await _usuarioRepository.ExcluirUsuario(id);
         }
@@ -201,7 +207,7 @@ namespace Application.Services
 
             if (usuarioEncontrado == null)
             {
-                throw new Exception("Email Inválido/Não Existente");
+                throw new Exception("Usuario Não Existente/Usuário incorreto");
             }
             HashDto hash = new HashDto();
             hash.CodigoSeguranca = Guid.NewGuid();
@@ -235,7 +241,7 @@ namespace Application.Services
                 throw new Exception("Código de Segurança Inválido!");
             }
 
-            if (usuarioEncontrado.Senha == hashComSenhaNova.novaSenha)
+            if (usuarioEncontrado.Senha == hashComSenhaNova.NovaSenha)
             {
                 throw new Exception("Essa senha foi utilizada anteriormente!");
             }
@@ -245,7 +251,7 @@ namespace Application.Services
                 throw new Exception("Tempo de mudança extrapolado! Gere um novo código.");
             }
 
-            usuarioEncontrado.Senha = hashComSenhaNova.novaSenha;
+            usuarioEncontrado.Senha = hashComSenhaNova.NovaSenha;
             usuarioEncontrado.DataAtualizacao = DateTime.Now;
 
             _usuarioRepository.AtualizarUsuario(usuarioEncontrado);
