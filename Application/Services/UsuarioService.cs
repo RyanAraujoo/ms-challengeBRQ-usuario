@@ -48,7 +48,7 @@ namespace Application.Services
             usuario.DataCadastro = DateTime.Now;
 
             usuario.Endereco = new Endereco();
-            usuario.Endereco.Id = new Guid();
+            usuario.Endereco.Id = usuario.EnderecoId;
             CepDto enderecoAPI = await _cepService.BuscarCep(usuarioDto.Endereco.Cep);
             usuario.Endereco.Cidade = enderecoAPI.Localidade;
             usuario.Endereco.Cep = enderecoAPI.Cep;
