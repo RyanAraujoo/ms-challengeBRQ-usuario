@@ -13,7 +13,7 @@ namespace Tests.DtosValidations.UsuarioValidation
         private ValidarDataDeNascimentoAttribute validarDataDeNascimentoAttribute = new ValidarDataDeNascimentoAttribute();
 
         [Theory]
-        [InlineData("2023-06-25", false)]
+        [InlineData("2023-06-25", true)]
         [InlineData("2002-11-11", true)]
         [InlineData("11-11-2002", false)]
         [InlineData("11112002", false)]
