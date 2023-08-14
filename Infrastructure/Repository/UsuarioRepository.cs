@@ -16,23 +16,6 @@ namespace Infrastructure.Repository
         {
             _context = context;
         }
-
-        public bool TestarConexao()
-        {
-            string connectionString = "Server=localhost;DataBase=ChallengeDbUsuarios;Uid=root;Pwd=";
-
-            using (var connection = new MySqlConnection(connectionString))
-            {
-                try
-                {
-                    return true;
-                }
-                catch (MySqlException ex)
-                {
-                    return false;
-                }
-            }
-        }
         public async Task<Usuario> AtualizarUsuario(Usuario usuarioAtualizado)
         {
             _context.Usuarios.Update(usuarioAtualizado);
@@ -63,7 +46,7 @@ namespace Infrastructure.Repository
             reqUsuario.Endereco = await _context.Enderecos.FirstOrDefaultAsync(e => e.Id.Equals(reqUsuario.EnderecoId));
             return reqUsuario;
         }
-        public async Task<string> ExcluirUsuario(Guid id)
+        public async Task<bool> ExcluirUsuario(Guid id)
         {
             var buscarUsuarioParaExcluir = buscarUsuario(id);
 
@@ -74,7 +57,7 @@ namespace Infrastructure.Repository
 
             _context.Usuarios.Remove(buscarUsuarioParaExcluir.Result) ;
             await _context.SaveChangesAsync();
-            return "Usuario Removido com Sucesso!";
+            return true;
         }
         public async Task<IEnumerable<UsuarioDetalhadoDto>> ListarUsuarios()
         {

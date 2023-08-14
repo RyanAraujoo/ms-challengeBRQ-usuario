@@ -7,8 +7,6 @@ using Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
  /*   .AddFluentValidation(options =>
     {
@@ -24,6 +22,7 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
+builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ICepService, CepService>();
 
 string mySqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");

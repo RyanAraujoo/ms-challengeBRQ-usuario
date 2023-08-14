@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Domain.Dto;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Presentation.Controllers
 {
@@ -25,10 +26,6 @@ namespace Presentation.Controllers
 
             } catch (Exception ex)
             {
-                if (ex.InnerException.Message.StartsWith("Duplicate"))
-                {
-                    return BadRequest("Algum item único está sendo duplicado.");
-                }
                   return UnprocessableEntity(ex.ToString());
             }
         }
@@ -40,10 +37,11 @@ namespace Presentation.Controllers
             {
                 var listarUsuarios = await _usuarioService.ListarUsuarios();
                 return Ok(listarUsuarios);
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                return BadRequest(ex.ToString());
-            }            
+                return StatusCode(500);
+            }
         }
         [HttpGet("usuarios/{idusuario}")]
         public async Task<IActionResult> DetalharUsuario(Guid idusuario)

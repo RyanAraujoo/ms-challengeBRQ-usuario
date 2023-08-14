@@ -13,7 +13,7 @@ namespace Infrastructure.Interfaces
         public Task<bool> CadastrarUsuario(Usuario usuario);
         public Task<IEnumerable<UsuarioDetalhadoDto>> ListarUsuarios();
         public Task<Usuario> DetalharUsuario(Guid id);
-        public Task<string> ExcluirUsuario(Guid id);
+        public Task<bool> ExcluirUsuario(Guid id);
         public Task<Usuario> AtualizarUsuario(Usuario usuarioAtualizado);
         public Task<Usuario> buscarUsuario(Guid id);
         public Task<Endereco> buscarEnderecoUsuario(Usuario usuario);
