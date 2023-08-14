@@ -4,7 +4,6 @@ using Domain.Dto;
 using Domain.Entity;
 using Infrastructure.Interfaces;
 using Moq;
-using Presentation.Controllers;
 using Xunit;
 
 namespace Tests.Services
@@ -217,7 +216,7 @@ namespace Tests.Services
             Assert.Equal(true, result);
         }
 
-      /*[Fact(Displ*ayName = "AtualizarUsuario - Quando a função for chamada - Deve retornar um valor booleano de confirmação da exclusão usuário")]
+        [Fact(DisplayName = "AtualizarUsuario - Quando a função for chamada - Deve retornar o usuário atualizado")]
         public async Task AtualizarUsuario()
         {
             Guid UserId = Guid.NewGuid();
@@ -225,6 +224,17 @@ namespace Tests.Services
             var patchUsuarioDto = new PatchUsuarioDto
             {
                 Email = "joao@example.com",
+                Endereco = new PatchEnderecoDto
+                {
+                    Logradouro = "Rua Exemplo",
+                    Complemento = "Complemento Exemplo",
+                    Numero = "123",
+                    Bairro = "Bairro Exemplo",
+                    Cidade = "Itambé",
+                    Estado = "BA",
+                    Pais = "País Exemplo",
+                    Cep = "45140000"
+                }
             };
             var mockUsuarioResult = new Usuario
             {
@@ -255,15 +265,205 @@ namespace Tests.Services
                     Cep = "45140000"
                 }
             };
+            var mockEndereco = new Endereco
+            {
+                Id = enderecoId,
+                Logradouro = "Rua Exemplo",
+                Complemento = "Complemento Exemplo",
+                Numero = "123",
+                Bairro = "Bairro Exemplo",
+                Cidade = "Itambé",
+                Estado = "BA",
+                Pais = "País Exemplo",
+                Cep = "45140000"
+            };
+            Task<Usuario> _usuario = Task.Run(() => mockUsuarioResult);
+            Task<Usuario> _usuario2 = Task.Run(() => mockUsuarioResult);
+            Task<Endereco> _enderecoUsuario = Task.Run(() => mockEndereco);
+            _usuarioRepository.Setup(s => s.buscarUsuario(UserId)).Returns(_usuario2);
+            _usuarioRepository.Setup(s => s.AtualizarUsuario(mockUsuarioResult)).Returns(_usuario);
+            _usuarioRepository.Setup(s => s.buscarEnderecoUsuario(mockUsuarioResult)).Returns(_enderecoUsuario);
+            var result = _usuarioService.AtualizarUsuario(UserId, patchUsuarioDto).Result;
+            Assert.Equal(mockUsuarioResult, result);
+        }
 
+        [Fact(DisplayName = "TrocarSenha - Quando a função for chamada - Deve retornar uma string de confirmação")]
+        public async Task TrocarSenha()
+        {
+            Guid UserId = Guid.NewGuid();
+            var enderecoId = Guid.NewGuid();
+
+            var mockUsuarioResult = new Usuario
+            {
+                Id = UserId,
+                EnderecoId = enderecoId,
+                DataDeNascimento = new DateTime(1990, 1, 1),
+                Cpf = "123.456.789-00",
+                Email = "joao@example.com",
+                NomeCompleto = "Fulano de Tal",
+                Senha = "senha123",
+                Apelido = "fulaninho",
+                Telefone = "7799999999",
+                CodigoSeguranca = null,
+                DataHoraCodigoSeguranca = null,
+                DataCadastro = DateTime.Now,
+                DataAtualizacao = null,
+                Sexo = 1,
+                Endereco = new Endereco
+                {
+                    Id = enderecoId,
+                    Logradouro = "Rua Exemplo",
+                    Complemento = "Complemento Exemplo",
+                    Numero = "123",
+                    Bairro = "Bairro Exemplo",
+                    Cidade = "Itambé",
+                    Estado = "BA",
+                    Pais = "País Exemplo",
+                    Cep = "45140000"
+                }
+            };
             Task<Usuario> _usuario = Task.Run(() => mockUsuarioResult);
             Task<Usuario> _usuario2 = Task.Run(() => mockUsuarioResult);
             _usuarioRepository.Setup(s => s.buscarUsuario(UserId)).Returns(_usuario2);
             _usuarioRepository.Setup(s => s.AtualizarUsuario(mockUsuarioResult)).Returns(_usuario);
 
-            var result = _usuarioService.AtualizarUsuario(UserId, patchUsuarioDto).Result;
-            Assert.Equal(mockUsuarioResult, result);
-        } */
+            var _body = new TrocarSenhaDto
+            {
+                SenhaAtual = "senha123",
+                SenhaNova = "senha123456789",
+            };
+
+            var result = _usuarioService.AlterarSenha(UserId, _body).Result;
+
+            Assert.Equal("Senha atualizada com sucesso.", result);
+        }
+
+        [Fact(DisplayName = "EsquecerSenha - Quando a função for chamada - Deve retornar um valor booleano de confirmação da exclusão usuário")]
+        public async Task EsquecerSenha()
+        {
+            Guid UserId = Guid.NewGuid();
+            var enderecoId = Guid.NewGuid();
+
+            var mockUsuarioInitial = new Usuario
+            {
+                Id = UserId,
+                EnderecoId = enderecoId,
+                DataDeNascimento = new DateTime(1990, 1, 1),
+                Cpf = "123.456.789-00",
+                Email = "joao@example.com",
+                NomeCompleto = "Fulano de Tal",
+                Senha = "senha123",
+                Apelido = "fulaninho",
+                Telefone = "7799999999",
+                CodigoSeguranca = null,
+                DataHoraCodigoSeguranca = null,
+                DataCadastro = DateTime.Now,
+                DataAtualizacao = null,
+                Sexo = 1,
+                Endereco = new Endereco
+                {
+                    Id = enderecoId,
+                    Logradouro = "Rua Exemplo",
+                    Complemento = "Complemento Exemplo",
+                    Numero = "123",
+                    Bairro = "Bairro Exemplo",
+                    Cidade = "Itambé",
+                    Estado = "BA",
+                    Pais = "País Exemplo",
+                    Cep = "45140000"
+                }
+            };
+            var mockUsuarioFinally = new Usuario
+            {
+                Id = UserId,
+                EnderecoId = enderecoId,
+                DataDeNascimento = new DateTime(1990, 1, 1),
+                Cpf = "123.456.789-00",
+                Email = "joao@example.com",
+                NomeCompleto = "Fulano de Tal",
+                Senha = "senha123",
+                Apelido = "fulaninho",
+                Telefone = "7799999999",
+                CodigoSeguranca = Guid.NewGuid(),
+                DataHoraCodigoSeguranca = DateTime.Now,
+                DataCadastro = DateTime.Now,
+                DataAtualizacao = null,
+                Sexo = 1,
+                Endereco = new Endereco
+                {
+                    Id = enderecoId,
+                    Logradouro = "Rua Exemplo",
+                    Complemento = "Complemento Exemplo",
+                    Numero = "123",
+                    Bairro = "Bairro Exemplo",
+                    Cidade = "Itambé",
+                    Estado = "BA",
+                    Pais = "País Exemplo",
+                    Cep = "45140000"
+                }
+            };
+            Task<Usuario> _usuario = Task.Run(() => mockUsuarioFinally);
+            Task<Usuario> _usuario2 = Task.Run(() => mockUsuarioInitial);
+            _usuarioRepository.Setup(s => s.buscarUsuario(UserId)).Returns(_usuario2);
+            _usuarioRepository.Setup(s => s.AtualizarUsuario(mockUsuarioInitial)).Returns(_usuario);
+
+            HashDto result = _usuarioService.EsquecerSenha(UserId).Result;
+
+            Assert.NotNull(result.DataHoraCodigoSeguranca);
+            Assert.NotNull(result.CodigoSeguranca);
+        }
+
+        [Fact(DisplayName = "AlterarSenhaViaHash - Quando a função for chamada - Deve retornar um valor booleano de confirmação da exclusão usuário")]
+        public async Task AlterarSenhaViaHash()
+        {
+            Guid UserId = Guid.NewGuid();
+            var enderecoId = Guid.NewGuid();
+
+            var mockUsuarioFinally = new Usuario
+            {
+                Id = UserId,
+                EnderecoId = enderecoId,
+                DataDeNascimento = new DateTime(1990, 1, 1),
+                Cpf = "123.456.789-00",
+                Email = "joao@example.com",
+                NomeCompleto = "Fulano de Tal",
+                Senha = "senha123",
+                Apelido = "fulaninho",
+                Telefone = "7799999999",
+                CodigoSeguranca = new Guid("72a6a75d-f8a2-410a-b774-db133019d18d"),
+                DataHoraCodigoSeguranca = DateTime.Now,
+                DataCadastro = DateTime.Now,
+                DataAtualizacao = null,
+                Sexo = 1,
+                Endereco = new Endereco
+                {
+                    Id = enderecoId,
+                    Logradouro = "Rua Exemplo",
+                    Complemento = "Complemento Exemplo",
+                    Numero = "123",
+                    Bairro = "Bairro Exemplo",
+                    Cidade = "Itambé",
+                    Estado = "BA",
+                    Pais = "País Exemplo",
+                    Cep = "45140000"
+                }
+            };
+            Task<Usuario> _usuario = Task.Run(() => mockUsuarioFinally);
+            Task<Usuario> _usuario2 = Task.Run(() => mockUsuarioFinally);
+            _usuarioRepository.Setup(s => s.buscarUsuario(UserId)).Returns(_usuario2);
+            _usuarioRepository.Setup(s => s.AtualizarUsuario(mockUsuarioFinally)).Returns(_usuario);
+
+            EsquecerSenhaDto _body = new EsquecerSenhaDto
+            {
+                HashDeSeguranca = "72a6a75d-f8a2-410a-b774-db133019d18d",
+                NovaSenha = "123445566789876543"
+            };
+
+            string result = _usuarioService.AlterarSenhaViaHash(UserId, _body).Result;
+
+            Assert.Equal("Senha atualizada com sucesso.", result);
+        }
+
 
     }
 }
