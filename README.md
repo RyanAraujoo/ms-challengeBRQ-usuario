@@ -48,6 +48,8 @@ Finalmente, execute o comando `dotnet run` para iniciar a aplicação. Isso inic
 }
 ```
 
+<img height="150em" widht="150em" src="./cobertura-codigo.png"/>
+
 ### Endpoints<a name="endpoints"></a>
 `POST` - /challengebrq/v1/usuarios                      `Cadastrar Usuários` <br>
 `GET` - /challengebrq/v1/usuarios                       `Listar Usuários` <br>
