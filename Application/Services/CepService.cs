@@ -1,43 +1,32 @@
-﻿
-using Application.Interfaces;
-using Domain.Dto;
-using Domain.Entity;
+﻿using Application.Interfaces;
+using Application.ViewModels;
+using Infrastructure.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
-using System.Net.Http.Json;
 
 namespace Application.Services
 {
     public class CepService : ICepService
     {
-        private static readonly HttpClient client = new HttpClient();
-        private readonly IMemoryCache _memoryCache;
+        private readonly ICepRepository _cepRepository;
+        private IMemoryCache _memoryCache;
+        private CepViewModel _cepViewModel;
 
-        public CepService(IMemoryCache memoryCache)
+        public CepService(IMemoryCache memoryCache, ICepRepository cepRepository)
         {
             _memoryCache = memoryCache;
+            _cepRepository = cepRepository;
         }
-        public async Task<CepDto> BuscarCep(string cep)
+        public async Task<CepViewModel> BuscarCep(string cep)
         {
-            CepDto cepDto = null;
-            if (!(_memoryCache.TryGetValue(cep, out cepDto)))
+            if (_memoryCache.TryGetValue(cep, out _cepViewModel))
             {
-                try
-                {
-                    HttpResponseMessage response = await client.GetAsync($"https://viacep.com.br/ws/{cep}/json/");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        cepDto = await response.Content.ReadFromJsonAsync<CepDto>();
-                        _memoryCache.Set(cep, cepDto, System.TimeSpan.FromDays(1));
-                        return cepDto;
-                    }
-                } catch (Exception ex)
-                {
-                    throw new Exception("Falha na comunicação com a API CEP.");
-                }
-               
+                return _cepViewModel;
             }
-            return cepDto; 
+
+           var _cep = _cepRepository.BuscarCep(cep);
+           _cepViewModel = new CepViewModel(_cep.Result.Cep, _cep.Result.Logradouro, _cep.Result.Complemento, _cep.Result.Bairro, _cep.Result.Localidade, _cep.Result.UF);
+           _memoryCache.Set(cep, _cepViewModel, System.TimeSpan.FromDays(1));
+           return _cepViewModel;
         }
     }
 

@@ -1,10 +1,9 @@
-﻿using Domain.Dto;
-using Domain.Entity;
+﻿using Application.ViewModels;
 
 namespace Application.Interfaces
 {
     public interface ICepService
     {
-        public Task<CepDto> BuscarCep(string cep);
+        public Task<CepViewModel> BuscarCep(string cep);
     }
 }
