@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Services;
+using Application.ViewModels;
 using Domain.Dto;
 using Domain.Entity;
 using Infrastructure.Interfaces;
@@ -76,19 +77,8 @@ namespace Tests.Services
                 }
             };
 
-            var mockCepDto = new CepDto
-            {
-                Cep = "45140-000",
-                Logradouro = "",
-                Complemento = "",
-                Bairro = "",
-                Localidade = "Itambé",
-                UF = "BA",
-                IBGE = "2915809",
-                GIA = "",
-                DDD = "77",
-                Siafi = "3617"
-            };
+            var mockCepDto = new CepViewModel("45140000", "", "", "", "Itambé", "BA");
+            
             var enderecoCriadoNoServiceViaCep = new Endereco
             {
                 Complemento = mockUsuarioDtoParaService.Endereco.Complemento,
@@ -117,7 +107,7 @@ namespace Tests.Services
             Task<bool> _repository = Task.Run(() => true);
             _usuarioRepository.Setup(s => s.CadastrarUsuario(mockUsuarioResult)).Returns(_repository);
 
-            Task<CepDto> _cepDto = Task.Run(() => mockCepDto);
+            Task<CepViewModel> _cepDto = Task.Run(() => mockCepDto);
             _cepService.Setup(s => s.BuscarCep(It.IsAny<string>())).Returns(_cepDto);
 
             var result = await _usuarioService.CadastrarUsuario(mockUsuarioDtoParaService);
