@@ -25,6 +25,9 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ICepService, CepService>();
 
+builder.Services.AddScoped<ICepRepository, CepRepository>();
+builder.Services.AddHttpClient<ICepRepository, CepRepository>();
+
 string mySqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 
     builder.Services.AddDbContext<ApiDbContext>(options =>

@@ -20,7 +20,7 @@ namespace Infrastructure.Repository
                 return cepDto;
             } else
             {
-                return new CepDto();
+                throw new Exception("Não foi possível obter os dados da API de CEP.");
             }
         }
     }
