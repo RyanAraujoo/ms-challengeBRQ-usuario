@@ -1,10 +1,9 @@
 ﻿using Domain.Validation.UsuarioValidation;
 using System.ComponentModel.DataAnnotations;
 
-
-namespace Domain.Dto
+namespace Application.InputModels
 {
-    public class UsuarioDto
+    public class UsuarioInputModel
     {
         [Required(ErrorMessage = "O campo CPF deve estar preenchido.")]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "O CPF deve ter 11 caracteres.")]
@@ -18,7 +17,7 @@ namespace Domain.Dto
 
         [Required(ErrorMessage = "o campo DataDeNascimento deve estar preenchido.")]
         [ValidarDataDeNascimento]
-       public string? DataDeNascimento { get; set; }
+        public string? DataDeNascimento { get; set; }
 
         [Required(ErrorMessage = "o campo SEXO deve estar preenchido.")]
         [MaxLength(2, ErrorMessage = "O SEXO deve ter, no máximo, 2 caracteres.")]
@@ -43,7 +42,6 @@ namespace Domain.Dto
         public DateTime? DataAtualizacao { get; set; }
 
         [Required(ErrorMessage = "o campo ENDEREÇO deve estar preenchido.")]
-        public EnderecoDto? Endereco { get; set; }
-
+        public EnderecoInputModel Endereco { get; set; }
     }
 }

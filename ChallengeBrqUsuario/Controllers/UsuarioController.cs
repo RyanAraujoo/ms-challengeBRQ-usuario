@@ -1,7 +1,7 @@
-﻿using Application.Interfaces;
+﻿using Application.InputModels;
+using Application.Interfaces;
 using Domain.Dto;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace Presentation.Controllers
 {
@@ -17,11 +17,11 @@ namespace Presentation.Controllers
         }
 
         [HttpPost("usuarios")]
-        public async Task<IActionResult> CadastrarUsuario([FromBody] UsuarioDto usuarioDto)
+        public async Task<IActionResult> CadastrarUsuario([FromBody] UsuarioInputModel usuarioInputModel)
         {
             try
             {
-                var cadastrarUsuario = await _usuarioService.CadastrarUsuario(usuarioDto);
+                var cadastrarUsuario = await _usuarioService.CadastrarUsuario(usuarioInputModel);
                 return Created($"/{cadastrarUsuario.Id}", cadastrarUsuario);
 
             } catch (Exception ex)

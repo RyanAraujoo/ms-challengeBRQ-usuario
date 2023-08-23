@@ -4,8 +4,6 @@ using Domain.Entity;
 using Infrastructure.DataBase;
 using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
-using System;
 
 namespace Infrastructure.Repository
 {

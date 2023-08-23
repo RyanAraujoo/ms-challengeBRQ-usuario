@@ -1,9 +1,10 @@
-﻿using Application.Interfaces;
+﻿using Application.InputModels;
+using Application.Interfaces;
+using Application.ViewModels;
 using Domain.Dto;
 using Domain.Entity;
 using Domain.Enum;
 using Infrastructure.Interfaces;
-using System.Globalization;
 
 namespace Application.Services
 {
@@ -17,10 +18,9 @@ namespace Application.Services
         {
             _usuarioRepository = usuarioRepository;
             _cepService = cepService;
-            
         }
 
-        private int TrasnformarStringEmIntEnumSexo(string stringValueSexo)
+        private int TrasnformarStringEnumSexoEmIntEnumSexo(string stringValueSexo)
         {
             foreach (var item in Enum.GetValues(typeof(Sexo)))
             {
@@ -32,54 +32,53 @@ namespace Application.Services
             return 4;
         }
 
-        public async Task<Usuario> CadastrarUsuario(UsuarioDto usuarioDto)
+        public async Task<UsuarioViewModel> CadastrarUsuario(UsuarioInputModel usuarioInputModel)
         {
-            Usuario usuario = new Usuario();
-            usuario.Id = new Guid();
-            usuario.EnderecoId = new Guid();
-            usuario.NomeCompleto = usuarioDto.NomeCompleto;
-            usuario.Apelido = usuarioDto.Apelido;
-            usuario.Email = usuarioDto.Email;
-            usuario.Cpf = usuarioDto.Cpf;
-            usuario.Senha = usuarioDto.Senha;
-            usuario.Telefone = usuarioDto.Telefone;
-            usuario.DataDeNascimento = DateTime.ParseExact(usuarioDto.DataDeNascimento, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-            usuario.Sexo = this.TrasnformarStringEmIntEnumSexo(usuarioDto.Sexo);
-            usuario.DataCadastro = DateTime.Now;
+            Usuario usuario = new Usuario
+            {
+                Cpf = usuarioInputModel.Cpf,
+                Email = usuarioInputModel.Email,
+                NomeCompleto = usuarioInputModel.NomeCompleto,
+                Senha = usuarioInputModel.Senha,
+                Apelido = usuarioInputModel.Apelido,
+                Telefone = usuarioInputModel.Telefone,
+                Sexo = TrasnformarStringEnumSexoEmIntEnumSexo(usuarioInputModel.Sexo)
+            };
+                
+            CepViewModel enderecoAPI = await _cepService.BuscarCep(usuarioInputModel.Endereco.Cep);
 
-            usuario.Endereco = new Endereco();
-            usuario.Endereco.Id = usuario.EnderecoId;
-            CepDto enderecoAPI = await _cepService.BuscarCep(usuarioDto.Endereco.Cep);
-            usuario.Endereco.Cidade = enderecoAPI.Localidade;
-            usuario.Endereco.Cep = enderecoAPI.Cep;
-            usuario.Endereco.Logradouro = enderecoAPI.Logradouro;
-            usuario.Endereco.Bairro = enderecoAPI.Bairro;
-            usuario.Endereco.Numero = usuarioDto.Endereco.Numero;
-            usuario.Endereco.Complemento = usuarioDto.Endereco.Complemento;
-            usuario.Endereco.Estado = enderecoAPI.UF;
-            usuario.Endereco.Pais = "BR";
+            usuario.AtrelarEnderecoAoUsuario(
+                enderecoAPI.Cep,
+                enderecoAPI.Bairro,
+                enderecoAPI.Logradouro,
+                enderecoAPI.Localidade,
+                enderecoAPI.UF,
+                usuarioInputModel.Endereco.Complemento,
+                usuarioInputModel.Endereco.Numero
+                );
+
+            usuario.DefinirDataDeNascimento(usuarioInputModel.DataDeNascimento);
 
             if (String.IsNullOrEmpty(usuario.Endereco.Logradouro))
             {
-                if (String.IsNullOrEmpty(usuarioDto.Endereco.Logradouro))
+                if (String.IsNullOrEmpty(usuarioInputModel.Endereco.Logradouro))
                 {
                     throw new Exception("Não foi possível identificar o Logradouro. Informe, por favor.");
                 }
-                    usuario.Endereco.Logradouro = usuarioDto.Endereco.Logradouro;
+                    usuario.Endereco.Logradouro = usuarioInputModel.Endereco.Logradouro;
             }
 
             if (String.IsNullOrEmpty(usuario.Endereco.Bairro))
             {
-                if (String.IsNullOrEmpty(usuarioDto.Endereco.Bairro))
+                if (String.IsNullOrEmpty(usuarioInputModel.Endereco.Bairro))
                 {
                     throw new Exception("Não foi possível identificar o Bairro. Informe, por favor.");
                 }
-                usuario.Endereco.Bairro = usuarioDto.Endereco.Bairro;
+                usuario.Endereco.Bairro = usuarioInputModel.Endereco.Bairro;
             }
-
             await _usuarioRepository.CadastrarUsuario(usuario);
-           
-            return usuario;
+            EnderecoInputModel _enderecoView = new EnderecoInputModel(usuarioInputModel.Endereco.Complemento,usuarioInputModel.Endereco.Numero,usuarioInputModel.Endereco.Cep,usuarioInputModel.Endereco.Bairro,usuarioInputModel.Endereco.Logradouro);
+            return new UsuarioViewModel(usuario.Id,usuarioInputModel.Cpf,usuarioInputModel.Email,usuarioInputModel.DataDeNascimento,usuarioInputModel.Sexo,usuarioInputModel.NomeCompleto,usuarioInputModel.Apelido,usuarioInputModel.Telefone,usuario.DataCadastro,_enderecoView);
         }
         
         public async Task<IEnumerable<UsuarioDetalhadoDto>> ListarUsuarios()
@@ -124,7 +123,7 @@ namespace Application.Services
 
             if (!string.IsNullOrEmpty(usuarioFinal.Sexo))
             {
-                usuarioInicial.Sexo = TrasnformarStringEmIntEnumSexo(usuarioFinal.Sexo);
+                usuarioInicial.Sexo = TrasnformarStringEnumSexoEmIntEnumSexo(usuarioFinal.Sexo);
             }
 
             if (!string.IsNullOrEmpty(usuarioFinal.Apelido))

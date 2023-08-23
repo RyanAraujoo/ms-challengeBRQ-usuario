@@ -1,11 +1,13 @@
-﻿using Domain.Dto;
+﻿using Application.InputModels;
+using Application.ViewModels;
+using Domain.Dto;
 using Domain.Entity;
 
 namespace Application.Interfaces
 {
    public interface IUsuarioService
     { 
-       public Task<Usuario> CadastrarUsuario(UsuarioDto usuarioDto);
+       public Task<UsuarioViewModel> CadastrarUsuario(UsuarioInputModel usuarioInputModel);
        public Task<IEnumerable<UsuarioDetalhadoDto>> ListarUsuarios();
        public Task<Usuario> DetalharUsuario(Guid id);
        public Task<bool> ExcluirUsuario(Guid id);
