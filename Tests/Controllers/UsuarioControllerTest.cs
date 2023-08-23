@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.InputModels;
+using Application.Interfaces;
+using Application.ViewModels;
 using Domain.Dto;
 using Domain.Entity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,72 +16,48 @@ namespace Tests.Controllers
         private Guid enderecoId;
         private IActionResult resultado;
         private readonly Mock<IUsuarioService> _usuarioService;
+        private readonly Usuario _usuarioResultMock;
+        private readonly UsuarioInputModel _usuarioInputMock;
+        private readonly UsuarioViewModel _usuarioViewModelMock;
 
         public UsuarioControllerTest()
         {
             _usuarioService = new Mock<IUsuarioService>();
             _usuarioController = new UsuarioController(_usuarioService.Object);
             enderecoId = Guid.NewGuid();
+            _usuarioInputMock = new UsuarioInputModel
+            {
+                Cpf = "123.456.789-00",
+                Email = "exemplo@email.com",
+                DataDeNascimento = new DateTime(1990, 1, 1).ToString("yyyy-MM-dd"),
+                Sexo = "M",
+                NomeCompleto = "Fulano de Tal",
+                Senha = "senha123",
+                Apelido = "fulaninho",
+                Telefone = "7799999999",
+                Endereco = new EnderecoInputModel("Complemento Exemplo", "123", "45140000", "Bairro Exemplo", "Rua Exemplo")
+            };
+            _usuarioViewModelMock = new UsuarioViewModel(Guid.NewGuid(), "123.456.789-00", "exemplo@email.com", "1990-11-11", "M", "Fulano de Tal", "Fulaninho", "7799999999", DateTime.Now, new EnderecoInputModel("Complemento Exemplo", "123", "45140000", "Bairro Exemplo", "Rua Exemplo"));
+            _usuarioResultMock = new Usuario
+            {
+                Cpf = "123.456.789-00",
+                Email = "exemplo@gmail.com",
+                NomeCompleto = "Fulano de Tal",
+                Senha = "senha123",
+                Apelido = "fulaninho",
+                Telefone = "7799999999",
+                Sexo = 1
+            };
+            _usuarioResultMock.AtrelarEnderecoAoUsuario("45140000", "Bairro Exemplo", "Logradouro Exemplo", "Itambé", "BA", "", "12");
+            _usuarioResultMock.DefinirDataDeNascimento("1990-01-01");
         }
         [Fact(DisplayName = "CadastrarUsuario - Quando a função for chamada - Deve criar um Usuário")]
 
         public async Task CadastrarUsuarioCriado()
         {
-            var mockUsuarioResult = new Usuario
-            {
-                Id = Guid.NewGuid(),
-                EnderecoId = enderecoId,
-                DataDeNascimento = new DateTime(1990, 1, 1),
-                Cpf = "123.456.789-00",
-                Email = "exemplo@email.com",
-                NomeCompleto = "Fulano de Tal",
-                Senha = "senha123",
-                Apelido = "fulaninho",
-                Telefone = "7799999999",
-                CodigoSeguranca = null,
-                DataHoraCodigoSeguranca = null,
-                DataCadastro = DateTime.Now,
-                DataAtualizacao = null,
-                Sexo = 1,
-                Endereco = new Endereco
-                {
-                    Id = enderecoId,
-                    Logradouro = "Rua Exemplo",
-                    Complemento = "Complemento Exemplo",
-                    Numero = "123",
-                    Bairro = "Bairro Exemplo",
-                    Cidade = "Itambé",
-                    Estado = "BA",
-                    Pais = "País Exemplo",
-                    Cep = "45140000"
-                }
-            };
-            var mockUsuarioDtoParaService = new UsuarioDto
-            {
-                Cpf = "12345678900",
-                Email = "exemplo@email.com",
-                DataDeNascimento = "1990-01-01",
-                Sexo = "M",
-                NomeCompleto = "Fulano de Tal",
-                Senha = "senha123",
-                Apelido = "fulano",
-                Telefone = "1234567890",
-                Endereco = new EnderecoDto
-                {
-                    Complemento = "Complemento Exemplo",
-                    Numero = "123",
-                    Cep = "45140000",
-                    Bairro = "Bairro Exemplo",
-                    Logradouro = "Rua Exemplo"
-                },
-            };
-
-            Task<Usuario> _usuario = Task.Run(() => mockUsuarioResult);
-            _usuarioService.Setup(s => s.CadastrarUsuario(It.IsAny<UsuarioDto>())).Returns(_usuario);
-
-
-            IActionResult resultado = _usuarioController.CadastrarUsuario(mockUsuarioDtoParaService).Result;
-
+            Task<UsuarioViewModel> _usuario = Task.Run(() => _usuarioViewModelMock);
+            _usuarioService.Setup(s => s.CadastrarUsuario(It.IsAny<UsuarioInputModel>())).Returns(_usuario);
+            IActionResult resultado = _usuarioController.CadastrarUsuario(_usuarioInputMock).Result;
             Assert.IsType<CreatedResult>(resultado);
             CreatedResult createdResult = (CreatedResult)resultado;
             Assert.Equal(201, createdResult.StatusCode);
@@ -87,34 +65,9 @@ namespace Tests.Controllers
         [Fact(DisplayName = "CadastrarUsuario - Quando a api CEP retornar logradouro vazio - Deve lançar exception")]
         public async Task CadastrarUsuarioExceptionLogradouro()
         {
-            var mockUsuarioDtoParaService = new UsuarioDto
-            {
-                Cpf = "12345678900",
-                Email = "exemplo@email.com",
-                DataDeNascimento = "1990-01-01",
-                Sexo = "M",
-                NomeCompleto = "Fulano de Tal",
-                Senha = "senha123",
-                Apelido = "fulano",
-                Telefone = "1234567890",
-                Endereco = new EnderecoDto
-                {
-                    Complemento = "Complemento Exemplo",
-                    Numero = "123",
-                    Cep = "45140000",
-                    Bairro = "Bairro Exemplo",
-                    Logradouro = "Rua Exemplo"
-                },
-            };
-
-            _usuarioService.Setup(s => s.CadastrarUsuario(It.IsAny<UsuarioDto>())).Throws(new Exception("Não foi possível identificar o Logradouro. Informe, por favor."));
-
-            // Chama a ação do controlador e captura o resultado
-            var resultado = await _usuarioController.CadastrarUsuario(mockUsuarioDtoParaService);
-
-            // Verifica o tipo do resultado
+            _usuarioService.Setup(s => s.CadastrarUsuario(It.IsAny<UsuarioInputModel>())).Throws(new Exception("Não foi possível identificar o Logradouro. Informe, por favor."));
+            var resultado = await _usuarioController.CadastrarUsuario(_usuarioInputMock);
             Assert.IsType<UnprocessableEntityObjectResult>(resultado);
-
         }
 
         [Fact(DisplayName = "ListarUsuario - Quando a função for chamada - Deve retornar uma lista de usuários simplificado")]
@@ -195,42 +148,9 @@ namespace Tests.Controllers
         [Fact(DisplayName = "DetalharUsuario - Quando a função for chamada - Deve retornar o usuário detalhado")]
         public async Task DetalharUsuario()
         {
-            Guid UserId = Guid.NewGuid();
-            var mockUsuarioResult = new Usuario
-            {
-                Id = UserId,
-                EnderecoId = enderecoId,
-                DataDeNascimento = new DateTime(1990, 1, 1),
-                Cpf = "123.456.789-00",
-                Email = "exemplo@email.com",
-                NomeCompleto = "Fulano de Tal",
-                Senha = "senha123",
-                Apelido = "fulaninho",
-                Telefone = "7799999999",
-                CodigoSeguranca = null,
-                DataHoraCodigoSeguranca = null,
-                DataCadastro = DateTime.Now,
-                DataAtualizacao = null,
-                Sexo = 1,
-                Endereco = new Endereco
-                {
-                    Id = enderecoId,
-                    Logradouro = "Rua Exemplo",
-                    Complemento = "Complemento Exemplo",
-                    Numero = "123",
-                    Bairro = "Bairro Exemplo",
-                    Cidade = "Itambé",
-                    Estado = "BA",
-                    Pais = "País Exemplo",
-                    Cep = "45140000"
-                }
-            };
-
-            Task<Usuario> _usuario = Task.Run(() => mockUsuarioResult);
-            _usuarioService.Setup(s => s.DetalharUsuario(UserId)).Returns(_usuario);
-
+            Task<Usuario> _usuario = Task.Run(() => _usuarioResultMock);
+            _usuarioService.Setup(s => s.DetalharUsuario(_usuarioResultMock.Id)).Returns(_usuario);
             IActionResult resultado = _usuarioController.DetalharUsuario(It.IsAny<Guid>()).Result;
-
             Assert.IsType<OkObjectResult>(resultado);
             OkObjectResult OkResult = (OkObjectResult)resultado;
             Assert.Equal(200, OkResult.StatusCode);
@@ -239,12 +159,8 @@ namespace Tests.Controllers
         [Fact(DisplayName = "DetalharUsuario - Quando o usuário não for encontrado - Deve retornar exceptions")]
         public async Task DetalharUsuarioFalha()
         {
-            Guid UserId = Guid.NewGuid();
-
-            _usuarioService.Setup(s => s.DetalharUsuario(UserId)).Throws(new Exception("Usuário não encontrado."));
-
-            resultado = await _usuarioController.DetalharUsuario(UserId);
-
+            _usuarioService.Setup(s => s.DetalharUsuario(_usuarioResultMock.Id)).Throws(new Exception("Usuário não encontrado."));
+            resultado = await _usuarioController.DetalharUsuario(_usuarioResultMock.Id);
             Assert.IsType<NotFoundObjectResult>(resultado);
         }
 
@@ -277,46 +193,16 @@ namespace Tests.Controllers
         [Fact(DisplayName = "AtualizarUsuario - Quando a função for chamada - Deve atualizar o usuário informado")]
         public async Task AtualizarUsuario()
         {
-            Guid UserId = Guid.NewGuid();
             var patchUsuarioDto = new PatchUsuarioDto
             {
                 Email = "joao@example.com",
             };
-            var mockUsuarioResult = new Usuario
-            {
-                Id = UserId,
-                EnderecoId = enderecoId,
-                DataDeNascimento = new DateTime(1990, 1, 1),
-                Cpf = "123.456.789-00",
-                Email = "joao@example.com",
-                NomeCompleto = "Fulano de Tal",
-                Senha = "senha123",
-                Apelido = "fulaninho",
-                Telefone = "7799999999",
-                CodigoSeguranca = null,
-                DataHoraCodigoSeguranca = null,
-                DataCadastro = DateTime.Now,
-                DataAtualizacao = null,
-                Sexo = 1,
-                Endereco = new Endereco
-                {
-                    Id = enderecoId,
-                    Logradouro = "Rua Exemplo",
-                    Complemento = "Complemento Exemplo",
-                    Numero = "123",
-                    Bairro = "Bairro Exemplo",
-                    Cidade = "Itambé",
-                    Estado = "BA",
-                    Pais = "País Exemplo",
-                    Cep = "45140000"
-                }
-            };
 
-            Task<Usuario> _usuario = Task.Run(() => mockUsuarioResult);
+            Task<Usuario> _usuario = Task.Run(() => _usuarioResultMock);
 
-            _usuarioService.Setup(s => s.AtualizarUsuario(UserId, patchUsuarioDto)).Returns(_usuario);
+            _usuarioService.Setup(s => s.AtualizarUsuario(_usuarioResultMock.Id, patchUsuarioDto)).Returns(_usuario);
 
-            resultado = await _usuarioController.AtualizarUsuario(UserId, patchUsuarioDto);
+            resultado = await _usuarioController.AtualizarUsuario(_usuarioResultMock.Id, patchUsuarioDto);
 
             Assert.IsType<OkObjectResult>(resultado);
         }
@@ -329,40 +215,8 @@ namespace Tests.Controllers
             {
                 Email = "joao@example.com",
             };
-            var mockUsuarioResult = new Usuario
-            {
-                Id = UserId,
-                EnderecoId = enderecoId,
-                DataDeNascimento = new DateTime(1990, 1, 1),
-                Cpf = "123.456.789-00",
-                Email = "joao@example.com",
-                NomeCompleto = "Fulano de Tal",
-                Senha = "senha123",
-                Apelido = "fulaninho",
-                Telefone = "7799999999",
-                CodigoSeguranca = null,
-                DataHoraCodigoSeguranca = null,
-                DataCadastro = DateTime.Now,
-                DataAtualizacao = null,
-                Sexo = 1,
-                Endereco = new Endereco
-                {
-                    Id = enderecoId,
-                    Logradouro = "Rua Exemplo",
-                    Complemento = "Complemento Exemplo",
-                    Numero = "123",
-                    Bairro = "Bairro Exemplo",
-                    Cidade = "Itambé",
-                    Estado = "BA",
-                    Pais = "País Exemplo",
-                    Cep = "45140000"
-                }
-            };
-
-            _usuarioService.Setup(s => s.AtualizarUsuario(UserId, patchUsuarioDto)).Throws(new Exception("Usuario não identificado."));
-
-            resultado = await _usuarioController.AtualizarUsuario(UserId, patchUsuarioDto);
-
+            _usuarioService.Setup(s => s.AtualizarUsuario(_usuarioResultMock.Id, patchUsuarioDto)).Throws(new Exception("Usuario não identificado."));
+            resultado = await _usuarioController.AtualizarUsuario(_usuarioResultMock.Id, patchUsuarioDto);
             Assert.IsType<BadRequestObjectResult>(resultado);
         }
 

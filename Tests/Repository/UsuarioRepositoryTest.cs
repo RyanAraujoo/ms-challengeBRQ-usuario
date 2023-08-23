@@ -1,8 +1,8 @@
-﻿using Domain.Dto;
-using Domain.Entity;
+﻿using Domain.Entity;
 using Infrastructure.DataBase;
 using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using Xunit;
 
 namespace Tests.Repository
@@ -11,45 +11,25 @@ namespace Tests.Repository
     {
         private readonly ApiDbContext _apiDbContext;
         private DbContextOptions<ApiDbContext> _options;
-        private Guid enderecoId;
-        private Usuario _usuarioMock;
-        private Guid idGuidUsuario;
+        private readonly Usuario _usuarioMock;
 
         public UsuarioRepositoryTest()
         {
             _options = new DbContextOptionsBuilder<ApiDbContext>()
            .UseInMemoryDatabase(databaseName: "ChallengeDbUsuarios")
            .Options;
-            idGuidUsuario = Guid.NewGuid();
             _usuarioMock = new Usuario
             {
-                Id = idGuidUsuario,
-                EnderecoId = enderecoId,
-                DataDeNascimento = new DateTime(1990, 1, 1),
                 Cpf = "123.456.789-00",
                 Email = "exemplo@gmail.com",
                 NomeCompleto = "Fulano de Tal",
                 Senha = "senha123",
                 Apelido = "fulaninho",
                 Telefone = "7799999999",
-                CodigoSeguranca = null,
-                DataHoraCodigoSeguranca = null,
-                DataCadastro = DateTime.Now,
-                DataAtualizacao = null,
-                Sexo = 1,
-                Endereco = new Endereco
-                {
-                    Id = enderecoId,
-                    Logradouro = "Rua Exemplo",
-                    Complemento = "Complemento Exemplo",
-                    Numero = "123",
-                    Bairro = "Bairro Exemplo",
-                    Cidade = "Itambé",
-                    Estado = "BA",
-                    Pais = "País Exemplo",
-                    Cep = "45140000"
-                }
+                Sexo = 1
             };
+            _usuarioMock.AtrelarEnderecoAoUsuario("45140000","Bairro Exemplo","Logradouro Exemplo","Itambé","BA","","12");
+            _usuarioMock.DefinirDataDeNascimento("1990-01-01");
         }
 
         [Fact(DisplayName = "CadastrarUsuario - Quando a função for chamada - Deve salvar o usuário no banco de dados")]
@@ -71,9 +51,9 @@ namespace Tests.Repository
                 UsuarioRepository _usuarioRepository = new UsuarioRepository(context);
                 context.Usuarios.Add(_usuarioMock);
                 context.SaveChanges();
-                Task<Usuario> _usuarioDetalhado = _usuarioRepository.DetalharUsuario(idGuidUsuario);
+                Task<Usuario> _usuarioDetalhado = _usuarioRepository.DetalharUsuario(_usuarioMock.Id);
 
-                Assert.Equal("123.456.789-00", _usuarioDetalhado.Result.Cpf);
+                Assert.Equal(_usuarioMock.Cpf, _usuarioDetalhado.Result.Cpf);
             }
         }
 
@@ -86,8 +66,8 @@ namespace Tests.Repository
                 UsuarioRepository _usuarioRepository = new UsuarioRepository(context);
                 context.Usuarios.Add(_usuarioMock);
                 context.SaveChanges();
-                Task<bool> _usuarioremovido = _usuarioRepository.ExcluirUsuario(idGuidUsuario);
-                Task<Usuario> _buscarUsuario = _usuarioRepository.buscarUsuario(idGuidUsuario);
+                Task<bool> _usuarioremovido = _usuarioRepository.ExcluirUsuario(_usuarioMock.Id);
+                Task<Usuario> _buscarUsuario = _usuarioRepository.buscarUsuario(_usuarioMock.Id);
                 Assert.Equal(true, _usuarioremovido.Result);
                 Assert.Null(_buscarUsuario.Result);
             }
@@ -101,7 +81,7 @@ namespace Tests.Repository
                 UsuarioRepository _usuarioRepository = new UsuarioRepository(context);
                 context.Usuarios.Add(_usuarioMock);
                 context.SaveChanges();
-                Task<Usuario> _buscarUsuario = _usuarioRepository.buscarUsuario(idGuidUsuario);
+                Task<Usuario> _buscarUsuario = _usuarioRepository.buscarUsuario(_usuarioMock.Id);
 
                 Assert.Equal(_buscarUsuario.Result, _usuarioMock);
             }
